@@ -12,16 +12,22 @@
 <body><div class="wrap">
 <header><div class="brand"><div class="logo">💄</div><span>מסע השברים והביוטי</span></div><div class="badge">⭐ כוכבים: <strong id="wallet">0</strong></div></header>
 <main>
-<section class="panel" id="map-screen"><div class="eyebrow">לומדות, צוברות כוכבים ופותחות את הדרך!</div><h1>מפת מסע השברים ✨</h1><p>בכל שלב מחכים לך תרגילי חיבור וחיסור של שברים מעורבים. בכל תרגיל לשני השברים יש אותו מכנה.</p><div class="notice">💡 בחיסור, השבר הראשון תמיד גדול מהשני או שווה לו.</div><div class="stages" id="stage-list"></div></section>
+<section class="panel" id="map-screen"><div class="eyebrow">לומדות, צוברות כוכבים ופותחות את הדרך!</div><h1>מפת מסע השברים ✨</h1><p>בכל שלב מחכים לך חיבור שברים מעורבים עם אותו מכנה, חיסור שברים מעורבים, וגם חיבור שברים פשוטים שבו לפחות מונה אחד גדול מהמכנה.</p><div class="notice">💡 בחיסור שברים מעורבים, המספר הראשון תמיד גדול מהשני או שווה לו.</div><div class="stages" id="stage-list"></div></section>
 <section class="hidden" id="quiz-screen"><div class="topline"><button class="secondary" id="map-button">← למפה</button><div class="badge" id="question-count"></div><div class="badge">⭐ <span id="score">0</span></div></div><div class="progress"><div id="progress-fill"></div></div><div class="question-box"><div class="question-type" id="question-type"></div><div class="question" id="question"></div><div class="small">בחרי את התשובה הנכונה</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" aria-live="polite"></div></div></section>
 <section class="hidden" id="result-screen"><div class="result-box"><div class="result-icon" id="result-icon">🏆</div><div class="eyebrow">סיימת את השלב!</div><h1 id="result-title"></h1><p id="result-text"></p><button class="primary" id="result-next">המשיכי</button> <button class="secondary" id="result-map">למפה</button></div></section>
 </main><div class="footer">היופי האמיתי הוא ללמוד וליהנות 🌸</div></div>
 <script>
 (()=>{
  'use strict';
- const KEY='fraction-beauty-game-v1',TOTAL=5,STAGES=12;
+ const KEY='fraction-beauty-game-v2',OLD_KEY='fraction-beauty-game-v1',TOTAL=5,STAGES=12;
  const defaults={wallet:0,earned:0,completed:[],owned:[],equipped:null};
- let state;try{state={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')};if(!Array.isArray(state.completed))state.completed=[];}catch{state={...defaults};}
+ let state;
+ try{
+  const saved=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(saved&&typeof saved==='object')state={...defaults,...saved};
+  else{const old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');state={...defaults,...(old&&typeof old==='object'?old:{}),completed:[]};localStorage.setItem(KEY,JSON.stringify(state));}
+  if(!Array.isArray(state.completed))state.completed=[];
+ }catch{state={...defaults};}
  let currentStage=1,questions=[],index=0,score=0,locked=false;
  const $=id=>document.getElementById(id);
  function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{}$('wallet').textContent=state.wallet;}
@@ -30,11 +36,25 @@
  function formatMixed(total,den){const whole=Math.floor(total/den),rem=total%den;if(!rem)return String(whole);const g=gcd(rem,den);return whole?`${whole} ${rem/g}/${den/g}`:`${rem/g}/${den/g}`;}
  function fractionMarkup(text){return text.replace(/(\d+)\s+(\d+\/\d+)/g,'$1&nbsp;$2');}
  function stageDenominator(stage){if(stage<=4)return 2+Math.floor(Math.random()*5);if(stage<=8)return 3+Math.floor(Math.random()*8);return 4+Math.floor(Math.random()*9);}
- function makeQuestion(stage){const den=stageDenominator(stage),subtract=Math.random()<.5;let w1=1+Math.floor(Math.random()*5),w2=1+Math.floor(Math.random()*5),n1=1+Math.floor(Math.random()*(den-1)),n2=1+Math.floor(Math.random()*(den-1));let left=w1*den+n1,right=w2*den+n2;if(subtract&&left<right){[left,right]=[right,left];[w1,w2]=[w2,w1];[n1,n2]=[n2,n1];}const result=subtract?left-right:left+right,answer=formatMixed(result,den);return{den,subtract,left:`${w1} ${n1}/${den}`,right:`${w2} ${n2}/${den}`,answer,result};}
- function makeOptions(q){const set=new Set([q.answer]);const candidates=[];for(let delta of [-2,-1,1,2]){const value=Math.max(1,q.result+delta*q.den);candidates.push(formatMixed(value,q.den));}for(let delta of [-1,1]){const value=Math.max(1,q.result+delta);candidates.push(formatMixed(value,q.den));}for(const value of candidates){if(set.size>=4)break;set.add(value);}let bump=1;while(set.size<4){set.add(formatMixed(q.result+bump,q.den));bump++;}return [...set].sort(()=>Math.random()-.5);}
+ function makeQuestion(stage){
+  const den=stageDenominator(stage),kind=Math.random()<.3?'simple-add':'mixed',subtract=kind==='mixed'&&Math.random()<.5;
+  if(kind==='simple-add'){
+   let n1=den+1+Math.floor(Math.random()*(den*2)),n2=1+Math.floor(Math.random()*(den*2));
+   if(n2<=den&&Math.random()<.5)[n1,n2]=[n2,n1];
+   if(n1<=den&&n2<=den)n1=den+1;
+   const result=n1+n2;
+   return{kind,den,subtract:false,left:`${n1}/${den}`,right:`${n2}/${den}`,answer:formatMixed(result,den),result};
+  }
+  let w1=1+Math.floor(Math.random()*5),w2=1+Math.floor(Math.random()*5),n1=1+Math.floor(Math.random()*(den-1)),n2=1+Math.floor(Math.random()*(den-1));
+  let left=w1*den+n1,right=w2*den+n2;
+  if(subtract&&left<right){[left,right]=[right,left];[w1,w2]=[w2,w1];[n1,n2]=[n2,n1];}
+  const result=subtract?left-right:left+right;
+  return{kind:'mixed',den,subtract,left:`${w1} ${n1}/${den}`,right:`${w2} ${n2}/${den}`,answer:formatMixed(result,den),result};
+ }
+ function makeOptions(q){const set=new Set([q.answer]);const candidates=[];for(const delta of [-2,-1,1,2]){const value=Math.max(1,q.result+delta*q.den);candidates.push(formatMixed(value,q.den));}for(const delta of [-1,1]){const value=Math.max(1,q.result+delta);candidates.push(formatMixed(value,q.den));}for(const value of candidates){if(set.size>=4)break;set.add(value);}let bump=1;while(set.size<4){set.add(formatMixed(q.result+bump,q.den));bump++;}return[...set].sort(()=>Math.random()-.5);}
  function renderMap(){const unlocked=highestUnlocked(),list=$('stage-list');list.innerHTML='';for(let n=1;n<=STAGES;n++){const done=state.completed.includes(n),available=n<=unlocked,card=document.createElement('article');card.className='stage';const title=document.createElement('h2');title.textContent=`שלב ${n} ${done?'⭐':''}`;const status=document.createElement('div');status.className='status';status.textContent=done?'הושלם!':available?'פתוח':'🔒 השלימי את השלב הקודם';const button=document.createElement('button');button.textContent=done?'שחקי שוב':'התחילי';button.disabled=!available;button.addEventListener('click',()=>startStage(n));card.append(title,status,button);list.append(card);}save();}
  function startStage(stage){currentStage=stage;index=0;score=0;locked=false;questions=Array.from({length:TOTAL},()=>makeQuestion(stage));$('map-screen').classList.add('hidden');$('result-screen').classList.add('hidden');$('quiz-screen').classList.remove('hidden');showQuestion();}
- function showQuestion(){$('question-count').textContent=`שלב ${currentStage} · שאלה ${index+1} מתוך ${TOTAL}`;$('score').textContent=score;$('progress-fill').style.width=`${index/TOTAL*100}%`;const q=questions[index];$('question-type').textContent=q.subtract?'חיסור שברים מעורבים · מכנה משותף':'חיבור שברים מעורבים · מכנה משותף';$('question').innerHTML=`${fractionMarkup(q.left)} ${q.subtract?'−':'+'} ${fractionMarkup(q.right)} = ?`;$('feedback').textContent='';const answers=$('answers');answers.innerHTML='';for(const value of makeOptions(q)){const button=document.createElement('button');button.className='answer';button.innerHTML=fractionMarkup(value);button.dataset.value=value;button.addEventListener('click',()=>chooseAnswer(value,button));answers.append(button);}}
+ function showQuestion(){$('question-count').textContent=`שלב ${currentStage} · שאלה ${index+1} מתוך ${TOTAL}`;$('score').textContent=score;$('progress-fill').style.width=`${index/TOTAL*100}%`;const q=questions[index];$('question-type').textContent=q.kind==='simple-add'?'חיבור שברים פשוטים · לפחות שבר אחד מדומה':q.subtract?'חיסור שברים מעורבים · מכנה משותף':'חיבור שברים מעורבים · מכנה משותף';$('question').innerHTML=`${fractionMarkup(q.left)} ${q.subtract?'−':'+'} ${fractionMarkup(q.right)} = ?`;$('feedback').textContent='';const answers=$('answers');answers.innerHTML='';for(const value of makeOptions(q)){const button=document.createElement('button');button.className='answer';button.innerHTML=fractionMarkup(value);button.dataset.value=value;button.addEventListener('click',()=>chooseAnswer(value,button));answers.append(button);}}
  function chooseAnswer(value,button){if(locked)return;locked=true;const q=questions[index],correct=value===q.answer;document.querySelectorAll('.answer').forEach(b=>{b.disabled=true;if(b.dataset.value===q.answer)b.classList.add('correct');});if(correct){score++;$('feedback').textContent='נכון מאוד! 🌟';$('feedback').style.color='#176b37';}else{button.classList.add('wrong');$('feedback').textContent=`לא בדיוק — התשובה הנכונה היא ${q.answer}`;$('feedback').style.color='#9d2525';}$('score').textContent=score;window.setTimeout(()=>{index++;if(index<TOTAL)showQuestion();else finish();},850);}
  function finish(){const passed=score>=3;if(passed&&!state.completed.includes(currentStage)){state.completed.push(currentStage);state.wallet+=score;state.earned+=score;}save();$('quiz-screen').classList.add('hidden');$('result-screen').classList.remove('hidden');$('result-icon').textContent=passed?'🏆':'💪';$('result-title').textContent=passed?'כל הכבוד! פתחת את הדרך לשלב הבא':'כמעט! אפשר לנסות שוב';$('result-text').textContent=`ענית נכון על ${score} מתוך ${TOTAL} שאלות.${passed?` צברת ${score} כוכבים!`:' צריך לפחות 3 תשובות נכונות כדי להשלים את השלב.'}`;$('result-next').classList.toggle('hidden',!passed||currentStage===STAGES);$('result-next').textContent=currentStage<STAGES?'לשלב הבא':'חזרה למפה';$('result-next').onclick=()=>currentStage<STAGES?startStage(currentStage+1):showMap();}
  function showMap(){$('quiz-screen').classList.add('hidden');$('result-screen').classList.add('hidden');$('map-screen').classList.remove('hidden');renderMap();}
