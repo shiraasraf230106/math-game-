@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7048e8">
+  <title>מסע השברים — משחק מתמטיקה</title>
+  <style>
+    :root{font-family:Arial,"Rubik",sans-serif;color:#292346;background:#f6f3ff;font-synthesis:none;text-rendering:optimizeLegibility}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 5%,#fff5dc 0,transparent 35%),radial-gradient(ellipse at 90% 25%,#e7e0ff 0,transparent 38%),#f7f5ff}
+    button{font:inherit;cursor:pointer} .wrap{width:min(920px,100%);margin:auto;padding:28px 18px 48px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.brand{display:flex;gap:12px;align-items:center;font-weight:900;font-size:1.15rem}.logo{width:48px;height:48px;border-radius:16px;background:#7048e8;color:white;display:grid;place-items:center;font-size:1.45rem;box-shadow:0 7px 18px #7048e83b}
+    .badge{background:#fff;border:1px solid #ebe6fb;border-radius:999px;padding:9px 14px;font-weight:700;color:#645b80;font-size:.9rem}
+    main{background:#fff;border:1px solid #eee9fa;border-radius:28px;box-shadow:0 18px 55px #44306b12;overflow:hidden}.topline{height:8px;background:#eee9fb}.progress{height:100%;width:0;background:linear-gradient(90deg,#ffbd59,#ff7c91);transition:width .35s ease}
+    .content{padding:clamp(22px,5vw,48px)}.intro{text-align:center}.sparkle{font-size:2.4rem;margin:4px 0 12px}.eyebrow{color:#806be1;font-size:.82rem;font-weight:800;letter-spacing:.04em}h1{font-size:clamp(2rem,6vw,3.15rem);margin:9px 0;color:#302552}h2{font-size:1.65rem;margin:0 0 10px}.lead{color:#766e8a;line-height:1.7;margin:0 auto 25px;max-width:570px}
+    .mode-label{font-weight:800;margin:20px 0 12px}.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:650px;margin:0 auto 26px}.mode{padding:16px 10px;border:2px solid #ece8f7;border-radius:18px;background:#fff;color:#4f456d;font-weight:800;transition:.18s}.mode:hover{transform:translateY(-2px);border-color:#b9a9f5}.mode.selected{background:#f2efff;border-color:#8062e8;color:#6544d5}.mode span{display:block;font-size:1.45rem;margin-bottom:7px}
+    .primary{border:0;border-radius:15px;background:#7048e8;color:#fff;font-weight:900;padding:15px 32px;box-shadow:0 7px 16px #7048e83d;transition:.18s}.primary:hover{background:#5e37d2;transform:translateY(-1px)}.small-note{color:#9189a2;font-size:.85rem;margin-top:16px}
+    .quiz-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:26px}.score{color:#6b5ba1;font-weight:800;background:#f4f1ff;padding:10px 14px;border-radius:13px}.question-card{background:#fbfaff;border:1px solid #eee9fa;border-radius:22px;padding:clamp(20px,4vw,34px);text-align:center}.question-type{color:#8977d7;font-weight:800;font-size:.9rem;margin-bottom:13px}.question{font-size:clamp(1.35rem,4vw,2rem);font-weight:900;line-height:1.5}.equation{direction:ltr;unicode-bidi:isolate;display:inline-block}.hint{min-height:24px;color:#877e99;font-size:.9rem;margin-top:8px}.answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0}.answer{background:white;border:2px solid #eae6f4;border-radius:16px;padding:15px 10px;min-height:62px;font-weight:900;font-size:1.18rem;color:#473b67;transition:.16s}.answer:hover:not(:disabled){border-color:#9c85ef;background:#faf8ff;transform:translateY(-2px)}.answer:disabled{cursor:default}.answer.correct{background:#e8f8ef;border-color:#55c782;color:#17693b}.answer.wrong{background:#fff0ee;border-color:#fa887b;color:#a33d32}.feedback{min-height:55px;text-align:center;border-radius:15px;padding:12px;margin:8px 0;color:#625875;line-height:1.5}.feedback.good{background:#eaf8ef;color:#226d41}.feedback.bad{background:#fff3ec;color:#96523d}.next-row{text-align:center;margin-top:4px}.hidden{display:none!important}.result{text-align:center;padding:18px 0}.result-icon{font-size:4rem}.result-text{color:#766e8a;line-height:1.7;max-width:480px;margin:12px auto 24px}.result-score{display:inline-block;background:#f2efff;color:#6746d4;font-weight:900;font-size:1.2rem;padding:13px 22px;border-radius:15px;margin:8px}.footer{text-align:center;color:#9a93a9;font-size:.82rem;margin-top:18px}
+    @media(max-width:560px){.wrap{padding:16px 12px 30px}.modes{gap:7px}.mode{font-size:.87rem;padding:12px 5px}.mode span{font-size:1.25rem}.quiz-head{align-items:flex-start}.badge{font-size:.8rem;padding:8px 10px}.answers{gap:9px}.answer{padding:13px 7px}.content{padding:24px 18px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header><div class="brand"><div class="logo">½</div><span>מסע השברים</span></div><div class="badge">🌟 לומדים בכיף!</div></header>
+    <main>
+      <div class="topline"><div class="progress" id="progress"></div></div>
+      <section class="content intro" id="start-screen">
+        <div class="sparkle">🧩✨</div><div class="eyebrow">משחק חשבון קטן, הצלחה גדולה</div>
+        <h1>מוכנים למסע השברים?</h1>
+        <p class="lead">בואי לפתור חידות על שברים פשוטים ושברים מעורבים. כל תשובה מקרבת אותך לניצחון — ואפשר ללמוד בקצב שלך.</p>
+        <div class="mode-label">באיזה מסלול נצא?</div>
+        <div class="modes" role="group" aria-label="בחירת מסלול">
+          <button class="mode selected" data-mode="simple"><span>🍕</span>שברים פשוטים</button>
+          <button class="mode" data-mode="mixed"><span>🎂</span>שברים מעורבים</button>
+          <button class="mode" data-mode="mix"><span>🎲</span>הכול ביחד</button>
+        </div>
+        <button class="primary" id="start-button">יוצאים לדרך! 🚀</button>
+        <div class="small-note">10 שאלות בכל סיבוב · בלי שעון · תמיד אפשר לנסות שוב</div>
+      </section>
+      <section class="content hidden" id="quiz-screen" aria-live="polite">
+        <div class="quiz-head"><div class="badge" id="question-count">שאלה 1 מתוך 10</div><div class="score">⭐ ניקוד: <span id="score">0</span></div></div>
+        <div class="question-card"><div class="question-type" id="question-type"></div><div class="question" id="question"></div><div class="hint" id="hint"></div></div>
+        <div class="answers" id="answers"></div><div class="feedback" id="feedback" aria-live="assertive"></div>
+        <div class="next-row"><button class="primary hidden" id="next-button">לשאלה הבאה ←</button></div>
+      </section>
+      <section class="content hidden result" id="result-screen" aria-live="polite">
+        <div class="result-icon" id="result-icon">🏆</div><div class="eyebrow">סיימת את המסע!</div><h2 id="result-title">כל הכבוד!</h2>
+        <div class="result-score" id="final-score"></div><p class="result-text" id="result-text"></p>
+        <button class="primary" id="again-button">עוד סיבוב? 🎉</button>
+      </section>
+    </main>
+    <div class="footer">טעות היא רק עוד דרך ללמוד 💜</div>
+  </div>
+<script>
+(() => {
+  const TOTAL = 10;
+  let mode = 'simple', questions = [], index = 0, score = 0, locked = false;
+  const $ = id => document.getElementById(id);
+  const gcd = (a,b) => b ? gcd(b,a%b) : a;
+  const fraction = (n,d) => { const g=gcd(Math.abs(n),d); return `${n/g}/${d/g}`; };
+  const mixedText = (whole,n,d) => n===0 ? `${whole}` : `${whole} ${fraction(n,d)}`;
+  const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+  const pick = a => a[Math.floor(Math.random()*a.length)];
+  const makeOptions = (answer, wrong) => {
+    const out=[answer];
+    for(const item of wrong) if(item!==answer && !out.includes(item) && out.length<4) out.push(item);
+    let n=1; while(out.length<4){const fallback=`${n+1}/${n+3}`;if(!out.includes(fallback)&&fallback!==answer)out.push(fallback);n++;}
+    return shuffle(out);
+  };
+  function simpleQuestion(){
+    const kind=pick(['add','subtract','compare','simplify']);
+    if(kind==='compare'){
+      let a,b,d1,d2; do{d1=2+Math.floor(Math.random()*9);d2=2+Math.floor(Math.random()*9);a=1+Math.floor(Math.random()*(d1-1));b=1+Math.floor(Math.random()*(d2-1));}while(a/d1===b/d2);
+      const answer=a/d1>b/d2?'>':'<';
+      return {type:'השוואת שברים',text:`מה הסימן המתאים? <span class="equation">${fraction(a,d1)} &nbsp; ? &nbsp; ${fraction(b,d2)}</span>`,hint:'חשבי על גודל החלקים, או הביאי את השברים למכנה משותף.',options:shuffle(['<','>','=']),answer,explain:`${fraction(a,d1)} ${answer} ${fraction(b,d2)} — בדקי איזה חלק גדול יותר.`};
+    }
+    if(kind==='simplify'){
+      const d=2+Math.floor(Math.random()*8), n=1+Math.floor(Math.random()*(d-1)), k=2+Math.floor(Math.random()*4), top=n*k, bot=d*k, answer=fraction(n,d);
+      return {type:'צמצום שברים',text:`צמצמי את השבר: <span class="equation">${top}/${bot}</span>`,hint:'חפשי מספר שמחלק גם את המונה וגם את המכנה.',options:makeOptions(answer,[`${n}/${d+1}`,`${n+1}/${d}`,`${top}/${d}`]),answer,explain:`מחלקים את המונה ואת המכנה באותו מספר. כאן התשובה המצומצמת היא ${answer}.`};
+    }
+    const d=2+Math.floor(Math.random()*8), a=1+Math.floor(Math.random()*(d-1)), b=1+Math.floor(Math.random()*(d-1));
+    const subtract=kind==='subtract'; const x=subtract?Math.max(a,b):a, y=subtract?Math.min(a,b):b, result=x+(subtract?-y:y);
+    const answer=fraction(result,d);
+    const raw=`${result}/${d}`;
+    return {type:subtract?'חיסור שברים':'חיבור שברים',text:`פתרי: <span class="equation">${fraction(x,d)} ${subtract?'−':'+'} ${fraction(y,d)}</span>`,hint:'כשהמכנים שווים, מחברים או מחסרים את המונים.',options:makeOptions(answer,[fraction(x+y,d),fraction(Math.abs(x-y)+1,d),`${result+1}/${d}`]),answer,explain:`המכנה נשאר ${d}, ו-${subtract?'מחסרים':'מחברים'} את המונים. ${raw} מצטמצם ל-${answer}.`};
+  }
+  function mixedQuestion(){
+    const kind=pick(['toImproper','toMixed','add']);
+    if(kind==='toImproper'){
+      const whole=1+Math.floor(Math.random()*4), d=2+Math.floor(Math.random()*8), n=1+Math.floor(Math.random()*(d-1)), top=whole*d+n, answer=`${top}/${d}`;
+      return {type:'המרה לשבר מדומה',text:`הפכי לשבר מדומה: <span class="equation">${whole} ${n}/${d}</span>`,hint:'כופלים את המספר השלם במכנה ומוסיפים את המונה.',options:makeOptions(answer,[`${whole+n}/${d}`,`${whole*d}/${d}`,`${top+1}/${d}`]),answer,explain:`${whole} × ${d} + ${n} = ${top}, לכן התשובה היא ${answer}.`};
+    }
+    if(kind==='toMixed'){
+      const d=2+Math.floor(Math.random()*8), whole=1+Math.floor(Math.random()*4), n=1+Math.floor(Math.random()*(d-1)), top=whole*d+n, answer=mixedText(whole,n,d);
+      return {type:'המרה לשבר מעורב',text:`הפכי לשבר מעורב: <span class="equation">${top}/${d}</span>`,hint:'חלקי את המונה במכנה: המנה היא השלם והשארית היא המונה החדש.',options:makeOptions(answer,[mixedText(whole+1,n,d),mixedText(whole,Math.max(1,n-1),d),mixedText(whole,n+1,d)]),answer,explain:`${top} ÷ ${d} = ${whole} ושארית ${n}, לכן התשובה היא ${answer}.`};
+    }
+    const d=2+Math.floor(Math.random()*6), w1=1+Math.floor(Math.random()*2), w2=1+Math.floor(Math.random()*2), a=Math.floor(Math.random()*d), b=Math.floor(Math.random()*d), total=w1*d+a+w2*d+b, whole=Math.floor(total/d), rem=total%d, answer=mixedText(whole,rem,d);
+    const wrong1=mixedText(w1+w2,a+b,d), wrong2=mixedText(w1+w2+1,Math.max(1,(a+b)%d),d), wrong3=mixedText(Math.max(1,whole-1),rem||1,d);
+    return {type:'חיבור שברים מעורבים',text:`פתרי: <span class="equation">${mixedText(w1,a,d)} + ${mixedText(w2,b,d)}</span>`,hint:'חברי את השברים. אם המונה גדול מהמכנה, הפכי חלק לשלם.',options:makeOptions(answer,[wrong1,wrong2,wrong3]),answer,explain:`מחברים את החלקים ומעבירים ${Math.floor((a+b)/d)} שלם/ים אם צריך. התשובה היא ${answer}.`};
+  }
+  function newRound(){
+    index=0;score=0;locked=false;questions=Array.from({length:TOTAL},()=>mode==='simple'?simpleQuestion():mode==='mixed'?mixedQuestion():Math.random()<.5?simpleQuestion():mixedQuestion());
+    $('start-screen').classList.add('hidden');$('result-screen').classList.add('hidden');$('quiz-screen').classList.remove('hidden');$('progress').style.width='0%';showQuestion();
+  }
+  function showQuestion(){
+    locked=false;const q=questions[index];$('question-count').textContent=`שאלה ${index+1} מתוך ${TOTAL}`;$('score').textContent=score;$('question-type').textContent=q.type;$('question').innerHTML=q.text;$('hint').textContent=q.hint;$('feedback').textContent='';$('feedback').className='feedback';$('next-button').classList.add('hidden');$('progress').style.width=`${index/TOTAL*100}%`;
+    const answers=$('answers');answers.innerHTML='';q.options.forEach(value=>{const b=document.createElement('button');b.className='answer';b.textContent=value;b.setAttribute('aria-label',`תשובה ${value}`);b.addEventListener('click',()=>chooseAnswer(value,b));answers.appendChild(b);});
+  }
+  function chooseAnswer(value,button){
+    if(locked)return;locked=true;const q=questions[index],correct=value===q.answer;
+    document.querySelectorAll('.answer').forEach(b=>{b.disabled=true;if(b.textContent===q.answer)b.classList.add('correct');});
+    if(correct){score++;$('feedback').textContent=`נכון מאוד! 🎉 ${q.explain}`;$('feedback').classList.add('good');}
+    else{button.classList.add('wrong');$('feedback').textContent=`כמעט! התשובה הנכונה היא ${q.answer}. ${q.explain}`;$('feedback').classList.add('bad');}
+    $('score').textContent=score;$('progress').style.width=`${(index+1)/TOTAL*100}%`;$('next-button').textContent=index===TOTAL-1?'לתוצאות 🏆':'לשאלה הבאה ←';$('next-button').classList.remove('hidden');
+  }
+  function finish(){
+    $('quiz-screen').classList.add('hidden');$('result-screen').classList.remove('hidden');$('progress').style.width='100%';
+    $('final-score').textContent=`${score} מתוך ${TOTAL} תשובות נכונות`;
+    let title,icon,text;if(score===TOTAL){title='מדהים! שולטת בשברים!';icon='🏆';text='ענית נכון על כל השאלות! את אלופת השברים האמיתית.';}else if(score>=7){title='איזו אלופה!';icon='🌟';text='יש לך הבנה נהדרת בשברים. עוד קצת תרגול ואת שולטת בהכול!';}else if(score>=4){title='כל הכבוד על המאמץ!';icon='💪';text='כל שאלה עוזרת ללמוד. נסי שוב ותראי כמה מהר משתפרים!';}else{title='התחלה מצוינת!';icon='🌱';text='תרגול עושה את ההבדל. אפשר לנסות שוב, ולקרוא את ההסברים אחרי כל תשובה.';}
+    $('result-title').textContent=title;$('result-icon').textContent=icon;$('result-text').textContent=text;
+  }
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');mode=b.dataset.mode;}));
+  $('start-button').addEventListener('click',newRound);$('again-button').addEventListener('click',newRound);$('next-button').addEventListener('click',()=>{index++;if(index===TOTAL)finish();else showQuestion();});
+})();
+</script>
+</body>
+</html>
