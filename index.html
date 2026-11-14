@@ -10,8 +10,8 @@
 <body><div class="wrap">
 <header><div class="brand"><div class="logo">💄</div><span>משחק השברים של לירי</span></div><div class="nav" aria-label="ניווט במשחק"><button class="nav-button active" id="map-nav">🗺️ מפת שלבים</button><button class="nav-button" id="shop-nav">💄 חנות היופי</button></div><div class="badge">⭐ כוכבים: <strong id="wallet">0</strong></div></header>
 <main>
-<section class="panel" id="map-screen"><div class="eyebrow">לומדות, צוברות כוכבים ופותחות את הדרך!</div><h1>מפת השברים של לירי ✨</h1><p>בכל שלב 10 שאלות מגוונות באותה רמת ידע: חיבור וחיסור, השוואת שברים וזיהוי חלקים צבועים.</p><div class="notice">💡 בחיסור שברים מעורבים, המספר הראשון תמיד גדול מהשני או שווה לו. בכל שלב שתשלימי תקבלי פריט איפור דיגיטלי!</div><div class="stages" id="stage-list"></div></section>
-<section class="panel hidden" id="shop-screen"><div class="eyebrow">אוסף וירטואלי בלבד — אין רכישות בכסף אמיתי</div><h1>חנות היופי הדיגיטלית 💄</h1><p>מוצרי איפור של מותגים מוכרים שנמכרים ב-Sephora. כל שלב שהושלם מוסיף פריט לאוסף.</p><div class="products" id="product-list"></div></section>
+<section class="panel" id="map-screen"><div class="eyebrow">לומדות, צוברות כוכבים ופותחות את הדרך!</div><h1>מפת השברים של לירי ✨</h1><p>בכל שלב 10 שאלות מגוונות: חיבור וחיסור, השוואת שבר פשוט לשבר מעורב באותו מכנה וזיהוי חלקים צבועים.</p><div class="notice">💡 בחיסור שברים מעורבים, המספר הראשון תמיד גדול מהשני או שווה לו. בכל שלב שתשלימי תקבלי פריט איפור דיגיטלי!</div><div class="stages" id="stage-list"></div></section>
+<section class="panel hidden" id="shop-screen"><div class="eyebrow">אוסף וירטואלי בלבד — אין רכישות בכסף אמיתי</div><h1>חנות היופי הדיגיטלית 💄</h1><p>מותגים מוכרים שנמכרים ב-Sephora; כל שלב שהושלם מוסיף פריט לאוסף.</p><div class="products" id="product-list"></div></section>
 <section class="hidden" id="quiz-screen"><div class="topline"><button class="secondary" id="map-button">← למפה</button><div class="badge" id="question-count"></div><div class="badge">⭐ <span id="score">0</span></div></div><div class="progress"><div id="progress-fill"></div></div><div class="question-box"><div class="star-layer" id="star-layer" aria-hidden="true"></div><div class="question-type" id="question-type"></div><div class="question" id="question"></div><div class="small">בחרי את התשובה הנכונה</div><div class="answers" id="answers"></div><div class="feedback" id="feedback" aria-live="polite"></div></div></section>
 <section class="hidden" id="result-screen"><div class="result-box"><div class="result-icon" id="result-icon">🏆</div><div class="eyebrow">סיימת את השלב!</div><h1 id="result-title"></h1><p id="result-text"></p><button class="primary" id="result-next">המשיכי</button> <button class="secondary" id="result-map">למפה</button></div></section>
 </main><div class="footer">היופי האמיתי הוא ללמוד וליהנות 🌸</div></div>
@@ -21,7 +21,7 @@
  const KEY='fraction-beauty-game-v2',OLD_KEY='fraction-beauty-game-v1',TOTAL=10,STAGES=12;
  const defaults={wallet:0,earned:0,completed:[],owned:[],equipped:null};
  const products=[
-  {name:'Soft Pinch Liquid Blush',brand:'Rare Beauty',image:'https://www.rarebeauty.com/cdn/shop/files/SoftPinchLiquidBlush_Resilience_PDP_2048x.png',url:'https://www.sephora.com/product/rare-beauty-soft-pinch-liquid-blush-P97845',video:'https://www.tiktok.com/@sephora/video/7280911959282033952'},
+  {name:'Soft Pinch Liquid Blush',brand:'Rare Beauty',image:'https://www.rarebeauty.com/cdn/shop/files/SoftPinchLiquidBlush_Resilience_PDP_2048x.png',url:'https://www.sephora.com/product/rare-beauty-soft-pinch-liquid-blush-P97845',video:'https://www.tiktok.com/@rarebeauty/video/7220966272048794938'},
   {name:'Airbrush Flawless Finish Powder',brand:'Charlotte Tilbury',image:'https://www.sephora.com/productimages/sku/s1616096-main-zoom.jpg',url:'https://www.sephora.com/product/airbrush-flawless-finish-setting-powder-P433526',video:'https://www.tiktok.com/@charlottetilbury/video/7364078625804291330'},
   {name:'Lip Butter Balm',brand:'Summer Fridays',image:'https://www.sephora.com/productimages/sku/s2338984-main-zoom.jpg?imwidth=315',url:'https://www.sephora.com/product/summer-fridays-lip-butter-balm-P455575',video:'https://www.tiktok.com/@summerfridays/video/7337127310192776522'},
   {name:'Brazilian Bum Bum Cream',brand:'Sol de Janeiro',image:'https://soldejaneiro.com/cdn/shop/products/SDJ_BumBumCream_Lid_Open_900x.jpg',url:'https://www.sephora.com/product/sol-de-janeiro-brazilian-bum-bum-cream-P409117',video:'https://www.tiktok.com/@soldejaneiro/video/7340279870198340906'}
@@ -36,17 +36,20 @@
  function fractionMarkup(text){return String(text).replace(/(?:(\d+)\s+)?(\d+)\/(\d+)/g,(_,whole,num,den)=>`${whole?`<span class="mixed-number"><span>${whole}</span>`:''}<span class="fraction"><span class="fraction-numerator">${num}</span><span class="fraction-bar" aria-hidden="true"></span><span class="fraction-denominator">${den}</span></span>${whole?'</span>':''}`);}
  function randomDen(stage){const min=stage<=4?3:stage<=8?4:5,max=stage<=4?8:stage<=8?10:12;return min+Math.floor(Math.random()*(max-min+1));}
  function makeQuestion(stage){
-  const kind=['mixed','mixed','compare','shade'][Math.floor(Math.random()*4)];
-  const den=randomDen(stage);
-  if(kind==='shade'){
-   const numerator=1+Math.floor(Math.random()*(den-1));
-   return{kind,den,numerator,correct:`${numerator}/${den}`};
-  }
+  const kind=['mixed','mixed','compare','shade'][Math.floor(Math.random()*4)],den=randomDen(stage);
+  if(kind==='shade'){const numerator=1+Math.floor(Math.random()*(den-1));return{kind,den,numerator,correct:`${numerator}/${den}`};}
   if(kind==='compare'){
-   const a=1+Math.floor(Math.random()*(den-1)),b=1+Math.floor(Math.random()*(den-1));
-   const c=1+Math.floor(Math.random()*(den-1)),d=1+Math.floor(Math.random()*(den-1));
-   const left=a*den+b,right=c*den+d,correct=left>right?'>':left<right?'<':'=';
-   return{kind,den,left:`${a}/${den}`,right:`${c}/${den}`,correct};
+   // Compare an ordinary (possibly improper) fraction with a mixed number, both using the same denominator.
+   const mixedWhole=1+Math.floor(Math.random()*3),mixedNum=1+Math.floor(Math.random()*(den-1));
+   const mixedValue=mixedWhole*den+mixedNum;
+   // Pick a simple-fraction numerator near the mixed value so all three signs can genuinely be correct.
+   const simpleNum=Math.max(1,mixedValue-2+Math.floor(Math.random()*5));
+   const simpleValue=simpleNum;
+   const simpleFirst=Math.random()<.5;
+   const simpleText=`${simpleNum}/${den}`,mixedText=`${mixedWhole} ${mixedNum}/${den}`;
+   const left=simpleFirst?simpleText:mixedText,right=simpleFirst?mixedText:simpleText;
+   const leftValue=simpleFirst?simpleValue:mixedValue,rightValue=simpleFirst?mixedValue:simpleValue;
+   return{kind,den,left,right,correct:leftValue>rightValue?'>':leftValue<rightValue?'<':'='};
   }
   const subtract=Math.random()<.5,w1=1+Math.floor(Math.random()*4),w2=1+Math.floor(Math.random()*4),n1=1+Math.floor(Math.random()*(den-1)),n2=1+Math.floor(Math.random()*(den-1));
   let left=w1*den+n1,right=w2*den+n2,first=`${w1} ${n1}/${den}`,second=`${w2} ${n2}/${den}`;
@@ -55,23 +58,16 @@
   return{kind:'mixed',den,subtract,left:first,right:second,result,correct:mixedString(result,den)};
  }
  function makeOptions(q){
-  if(q.kind==='compare')return [...new Set([q.correct,'<','>','='])].sort(()=>Math.random()-.5);
-  if(q.kind==='shade'){
-   const values=new Set([q.correct]);for(let n=0;n<=q.den&&values.size<4;n++)values.add(`${n}/${q.den}`);
-   return [...values].sort(()=>Math.random()-.5);
-  }
-  const values=new Set([q.correct]);
-  for(const delta of [-2,-1,1,2,-q.den,q.den,3,-3]){if(values.size>=4)break;const n=Math.max(1,q.result+delta);values.add(mixedString(n,q.den));}
-  let bump=1;while(values.size<4)values.add(mixedString(q.result+bump++,q.den));
-  return [...values].sort(()=>Math.random()-.5);
+  if(q.kind==='compare')return ['<','>','='];
+  if(q.kind==='shade'){const values=new Set([q.correct]);for(let n=1;n<q.den&&values.size<4;n++)values.add(`${n}/${q.den}`);return [...values].sort(()=>Math.random()-.5);}
+  const values=new Set([q.correct]);for(const delta of [-2,-1,1,2,-q.den,q.den,3,-3]){if(values.size>=4)break;values.add(mixedString(Math.max(1,q.result+delta),q.den));}let bump=1;while(values.size<4)values.add(mixedString(q.result+bump++,q.den));return [...values].sort(()=>Math.random()-.5);
  }
  function renderMap(){const unlocked=highestUnlocked(),list=$('stage-list');list.innerHTML='';for(let n=1;n<=STAGES;n++){const done=state.completed.includes(n),card=document.createElement('article');card.className='stage';const title=document.createElement('h2');title.textContent=`שלב ${n} ${done?'⭐':''}`;const status=document.createElement('div');status.className='status';status.textContent=done?'הושלם!':n<=unlocked?'פתוח':'🔒 השלימי את השלב הקודם';const button=document.createElement('button');button.textContent=done?'שחקי שוב':'התחילי';button.disabled=n>unlocked;button.addEventListener('click',()=>startStage(n));card.append(title,status,button);list.append(card);}save();}
  function renderShop(){const list=$('product-list');list.innerHTML='';for(let stage=1;stage<=STAGES;stage++){const owned=state.owned.includes(stage),product=products[(stage-1)%products.length],card=document.createElement('article');card.className=`product${owned?'':' locked'}`;const img=document.createElement('img');img.className='product-image';img.src=product.image;img.alt=product.name;img.loading='lazy';img.onerror=()=>{img.alt='תמונת המוצר אינה זמינה';img.style.display='none';};const title=document.createElement('h2');title.textContent=owned?product.name:`מוצר של שלב ${stage}`;const brand=document.createElement('div');brand.className='small';brand.textContent=product.brand;const status=document.createElement('div');status.className='product-status';status.textContent=owned?'התקבל לאוסף שלך!':`השלימי את שלב ${stage} כדי לקבל`;card.append(img,title,brand,status);if(owned){for(const [label,href] of [['למוצר ב-Sephora',product.url],['לסרטון TikTok על המוצר',product.video]]){const link=document.createElement('a');link.className='product-link';link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=label;card.append(link);}}list.append(card);}}
  function setScreen(name){for(const s of ['map','shop','quiz','result'])$(s+'-screen').classList.toggle('hidden',s!==name);$('map-nav').classList.toggle('active',name==='map');$('shop-nav').classList.toggle('active',name==='shop');if(name==='map')renderMap();if(name==='shop')renderShop();}
  function startStage(stage){if(nextTimer){clearTimeout(nextTimer);nextTimer=null;}currentStage=stage;index=0;score=0;locked=false;questions=Array.from({length:TOTAL},()=>makeQuestion(stage));setScreen('quiz');renderQuestion();}
- function renderQuestion(){locked=false;const q=questions[index];if(!q){finish();return;}$('question-count').textContent=`שלב ${currentStage} · שאלה ${index+1} מתוך ${TOTAL}`;$('score').textContent=score;$('progress-fill').style.width=`${index/TOTAL*100}%`;$('feedback').textContent='';$('feedback').style.color='';const question=$('question'),answers=$('answers');answers.replaceChildren();if(q.kind==='compare'){$('question-type').textContent='השוואה · מכנים שווים';question.innerHTML=`<span class="comparison"><span class="compare-fraction">${fractionMarkup(q.left)}</span><span>?</span><span class="compare-fraction">${fractionMarkup(q.right)}</span></span>`;}else if(q.kind==='shade'){$('question-type').textContent='צביעת חלקים · איזה שבר צבוע?';const cols=Math.min(6,q.den),board=document.createElement('div');board.className='shade-board';board.style.gridTemplateColumns=`repeat(${cols},1fr)`;for(let i=0;i<q.den;i++){const cell=document.createElement('span');cell.className=`shade-cell${i<q.numerator?' filled':''}`;board.append(cell);}question.replaceChildren(board);}else{$('question-type').textContent=q.subtract?'חיסור שברים מעורבים · מכנה משותף':'חיבור שברים מעורבים · מכנה משותף';question.innerHTML=`${fractionMarkup(q.left)} ${q.subtract?'−':'+'} ${fractionMarkup(q.right)} = ?`;}
-  for(const value of makeOptions(q)){const button=document.createElement('button');button.type='button';button.className='answer';button.dataset.value=value;button.innerHTML=q.kind==='compare'?value:fractionMarkup(value);answers.append(button);}
- }
+ function renderQuestion(){locked=false;const q=questions[index];if(!q){finish();return;}$('question-count').textContent=`שלב ${currentStage} · שאלה ${index+1} מתוך ${TOTAL}`;$('score').textContent=score;$('progress-fill').style.width=`${index/TOTAL*100}%`;$('feedback').textContent='';$('feedback').style.color='';const question=$('question'),answers=$('answers');answers.replaceChildren();if(q.kind==='compare'){$('question-type').textContent='השוואה · שבר פשוט ושבר מעורב בעלי אותו מכנה';question.innerHTML=`<span class="comparison"><span class="compare-fraction">${fractionMarkup(q.left)}</span><span>?</span><span class="compare-fraction">${fractionMarkup(q.right)}</span></span>`;}else if(q.kind==='shade'){$('question-type').textContent='צביעת חלקים · איזה שבר צבוע?';const cols=Math.min(6,q.den),board=document.createElement('div');board.className='shade-board';board.style.gridTemplateColumns=`repeat(${cols},1fr)`;for(let i=0;i<q.den;i++){const cell=document.createElement('span');cell.className=`shade-cell${i<q.numerator?' filled':''}`;board.append(cell);}question.replaceChildren(board);}else{$('question-type').textContent=q.subtract?'חיסור שברים מעורבים · מכנה משותף':'חיבור שברים מעורבים · מכנה משותף';question.innerHTML=`${fractionMarkup(q.left)} ${q.subtract?'−':'+'} ${fractionMarkup(q.right)} = ?`;}
+  for(const value of makeOptions(q)){const button=document.createElement('button');button.type='button';button.className='answer';button.dataset.value=value;button.innerHTML=q.kind==='compare'?value:fractionMarkup(value);answers.append(button);}}
  function playCorrectSound(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!audioContext)audioContext=new C();if(audioContext.state==='suspended')audioContext.resume();const now=audioContext.currentTime;[660,880,1100].forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.frequency.value=hz;gain.gain.setValueAtTime(.0001,now+i*.09);gain.gain.exponentialRampToValueAtTime(.1,now+i*.09+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+i*.09+.2);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now+i*.09);osc.stop(now+i*.09+.22);});}catch{}}
  function stars(){const layer=$('star-layer');layer.replaceChildren();const glyphs=['⭐','✨','🌟'];for(let i=0;i<22;i++){const el=document.createElement('span');el.className='burst-star';el.textContent=glyphs[i%glyphs.length];el.style.setProperty('--x',`${8+Math.random()*84}%`);el.style.setProperty('--y',`${20+Math.random()*55}%`);el.style.setProperty('--size',`${16+Math.random()*20}px`);el.style.setProperty('--dx',`${(Math.random()-.5)*140}px`);el.style.setProperty('--dy',`${-35-Math.random()*130}px`);el.style.animationDelay=`${Math.random()*.15}s`;layer.append(el);}window.setTimeout(()=>layer.replaceChildren(),1400);}
  function submit(button){if(locked||!button||button.disabled)return;locked=true;const q=questions[index];if(!q)return;$('answers').querySelectorAll('button.answer').forEach(b=>{b.disabled=true;if(b.dataset.value===q.correct)b.classList.add('correct');});if(button.dataset.value===q.correct){score++;$('feedback').textContent='נכון מאוד! 🌟';$('feedback').style.color='#176b37';playCorrectSound();stars();}else{button.classList.add('wrong');$('feedback').innerHTML=`לא בדיוק — התשובה הנכונה היא ${q.kind==='compare'?q.correct:fractionMarkup(q.correct)}`;$('feedback').style.color='#9d2525';}$('score').textContent=score;nextTimer=window.setTimeout(()=>{nextTimer=null;if(index<TOTAL-1){index++;renderQuestion();}else{index=TOTAL;finish();}},750);}
