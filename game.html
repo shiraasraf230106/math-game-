@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f05a9d">
+  <title>משחק השברים של לירי ✨</title>
+  <style>
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body { overflow: hidden; }
+    #game { display: block; width: 100%; height: 100%; border: 0; }
+    #fallback { position: fixed; z-index: 1; inset: auto 1rem 1rem auto; padding: .65rem 1rem; border-radius: .75rem; background: #a92d68; color: white; font: 600 14px Arial, sans-serif; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <iframe id="game" title="משחק השברים של לירי" src="./index.html"></iframe>
+  <a id="fallback" href="./index.html" target="_blank" rel="noopener noreferrer">פתיחת המשחק בחלון חדש</a>
+  <script>
+    (() => {
+      const frame = document.getElementById('game');
+      function replaceUnavailableVideoLinks() {
+        try {
+          const doc = frame.contentDocument;
+          if (!doc) return;
+          doc.querySelectorAll('a.product-link[href*="tiktok.com"][href*="/video/"]').forEach(link => {
+            const url = new URL(link.href);
+            const profile = url.pathname.match(/^\/@[^/]+/);
+            if (!profile) return;
+            link.href = `${url.origin}${profile[0]}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = 'פתיחת פרופיל TikTok';
+            link.setAttribute('aria-label', 'פתיחת פרופיל המותג ב-TikTok בחלון חדש');
+          });
+        } catch (_) {
+          // The original game remains available if browser restrictions prevent link updates.
+        }
+      }
+      frame.addEventListener('load', () => {
+        replaceUnavailableVideoLinks();
+        try {
+          const observer = new MutationObserver(replaceUnavailableVideoLinks);
+          observer.observe(frame.contentDocument.body, { childList: true, subtree: true });
+        } catch (_) {}
+      });
+    })();
+  </script>
+</body>
+</html>
